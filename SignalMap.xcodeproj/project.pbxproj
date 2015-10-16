@@ -13,6 +13,10 @@
 		4A90CD721BD05A09000D24CF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A90CD701BD05A09000D24CF /* Main.storyboard */; };
 		4A90CD741BD05A09000D24CF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A90CD731BD05A09000D24CF /* Assets.xcassets */; };
 		4A90CD771BD05A09000D24CF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A90CD751BD05A09000D24CF /* LaunchScreen.storyboard */; };
+		4A90CD801BD05B03000D24CF /* SignalController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A90CD7F1BD05B03000D24CF /* SignalController.m */; settings = {ASSET_TAGS = (); }; };
+		4A90CD821BD05F77000D24CF /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A90CD811BD05F77000D24CF /* CoreTelephony.framework */; };
+		4A90CD841BD05F7D000D24CF /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A90CD831BD05F7D000D24CF /* CoreLocation.framework */; };
+		4A90CD871BD0863F000D24CF /* APIController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4A90CD861BD0863F000D24CF /* APIController.m */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +30,12 @@
 		4A90CD731BD05A09000D24CF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4A90CD761BD05A09000D24CF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4A90CD781BD05A09000D24CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4A90CD7E1BD05B03000D24CF /* SignalController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalController.h; sourceTree = "<group>"; };
+		4A90CD7F1BD05B03000D24CF /* SignalController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalController.m; sourceTree = "<group>"; };
+		4A90CD811BD05F77000D24CF /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		4A90CD831BD05F7D000D24CF /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		4A90CD851BD0863F000D24CF /* APIController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APIController.h; sourceTree = "<group>"; };
+		4A90CD861BD0863F000D24CF /* APIController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = APIController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +43,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4A90CD841BD05F7D000D24CF /* CoreLocation.framework in Frameworks */,
+				4A90CD821BD05F77000D24CF /* CoreTelephony.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +54,8 @@
 		4A90CD5B1BD05A08000D24CF = {
 			isa = PBXGroup;
 			children = (
+				4A90CD831BD05F7D000D24CF /* CoreLocation.framework */,
+				4A90CD811BD05F77000D24CF /* CoreTelephony.framework */,
 				4A90CD661BD05A09000D24CF /* SignalMap */,
 				4A90CD651BD05A09000D24CF /* Products */,
 			);
@@ -62,6 +76,10 @@
 				4A90CD6B1BD05A09000D24CF /* AppDelegate.m */,
 				4A90CD6D1BD05A09000D24CF /* ViewController.h */,
 				4A90CD6E1BD05A09000D24CF /* ViewController.m */,
+				4A90CD7E1BD05B03000D24CF /* SignalController.h */,
+				4A90CD851BD0863F000D24CF /* APIController.h */,
+				4A90CD861BD0863F000D24CF /* APIController.m */,
+				4A90CD7F1BD05B03000D24CF /* SignalController.m */,
 				4A90CD701BD05A09000D24CF /* Main.storyboard */,
 				4A90CD731BD05A09000D24CF /* Assets.xcassets */,
 				4A90CD751BD05A09000D24CF /* LaunchScreen.storyboard */,
@@ -151,8 +169,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A90CD6F1BD05A09000D24CF /* ViewController.m in Sources */,
+				4A90CD871BD0863F000D24CF /* APIController.m in Sources */,
 				4A90CD6C1BD05A09000D24CF /* AppDelegate.m in Sources */,
 				4A90CD691BD05A09000D24CF /* main.m in Sources */,
+				4A90CD801BD05B03000D24CF /* SignalController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +282,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = SignalMap/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.phyrrus9.SignalMap;
@@ -273,6 +294,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = SignalMap/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.phyrrus9.SignalMap;
