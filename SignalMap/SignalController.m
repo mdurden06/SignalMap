@@ -7,30 +7,81 @@
 //
 
 #import "SignalController.h"
+#import <CoreTelephony/CTTelephonyNetworkInfo.h>
+#import <CoreTelephony/CTCarrier.h>
+@import UIKit;
 
 /*****Undocumented API Calls*****/
 int CTGetSignalStrength();
 NSString * CTSIMSupportGetSIMStatus();
+void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 /**End Undocumented API Calls**/
 
 @implementation SignalData
-#define SIGNAL_RANGE 100.0
+#define SIGNAL_RANGE 80.0
+//real range: 40 to 120
 - (float)getSignalStrength {
-	return (float)((float)[self getRawSignalStrength] / SIGNAL_RANGE) * 100.0;
+	return (float)((float)(SIGNAL_RANGE - ([self getRawSignalStrength] - 40)) / SIGNAL_RANGE) * 100.0;
 }
+
+- (int)signalStrength{ //pretty clever hack, but it works!
+	UIApplication *app = [UIApplication sharedApplication];
+	NSArray *subviews = [[[app valueForKey:@"statusBar"] valueForKey:@"foregroundView"] subviews];
+	NSString *dataNetworkItemView = nil;
+	for (id subview in subviews) {
+		if([subview isKindOfClass:[NSClassFromString(@"UIStatusBarSignalStrengthItemView") class]]) {
+			dataNetworkItemView = subview;
+			break;
+		}
+	}
+	return [[dataNetworkItemView valueForKey:@"signalStrengthRaw"] intValue];
+}
+
 - (int)getRawSignalStrength {
 	//check connection info
 	isConnected = [CTSIMSupportGetSIMStatus() isEqualToString: @"kCTSIMSupportSIMStatusReady"];
 	//check signal info
 	for (int i = 0; i < 10; i++)
-		rawSignalStrength += CTGetSignalStrength();
+		rawSignalStrength += [self signalStrength];
 	rawSignalStrength /= 10;
+	rawSignalStrength *= -1;
 	//compare
 	isConnected = (rawSignalStrength > 0) && isConnected;
 	NSLog(@"Connected: %c\tRaw signal strength: %d\n", isConnected ? '1' : '0', rawSignalStrength);
 	if (!isConnected)
 		return 0;
 	return rawSignalStrength;
+}
+- (dataType)getConnectedService {
+	dataType ret = kdNone;
+	CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
+	NSString *networkType = [telephonyInfo currentRadioAccessTechnology];
+	
+	NSLog(@"Current Radio Access Technology: %@, (%@)", telephonyInfo.currentRadioAccessTechnology,
+		 [[telephonyInfo subscriberCellularProvider]carrierName]);
+	if ([networkType isEqualToString: CTRadioAccessTechnologyCDMA1x])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyCDMAEVDORev0])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyCDMAEVDORevA])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyCDMAEVDORevB])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyEdge])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyeHRPD])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyGPRS])
+		ret = kdEDGE;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyHSDPA])
+		ret = kd4G;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyHSUPA])
+		ret = kd3G;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyWCDMA])
+		ret = kd3G;
+	else if ([networkType isEqualToString: CTRadioAccessTechnologyLTE])
+		ret = kdLTE;
+	return ret;
 }
 @end
 
@@ -40,7 +91,6 @@ NSString * CTSIMSupportGetSIMStatus();
 	locationManager.distanceFilter = kCLDistanceFilterNone;
 	locationManager.desiredAccuracy = kCLLocationAccuracyBest;
 	locationManager.delegate = self;
-	//locationManager.allowsBackgroundLocationUpdates = YES;
 	[locationManager requestWhenInUseAuthorization];
 	[locationManager startUpdatingLocation];
 }
@@ -90,7 +140,8 @@ NSString * CTSIMSupportGetSIMStatus();
 		    @"Longitude" : [locationData objectForKey:@"Longitude"],
 		    @"Signal" : [NSNumber numberWithFloat: [signalInfo getSignalStrength]],
 		    @"RawSignal" : [NSNumber numberWithInt: [signalInfo getRawSignalStrength ]],
-		    @"TimeSinceLastLocation" : [NSNumber numberWithInt: (int)[locationData objectForKey: @"TimeSinceUpdate"]]
+		    @"TimeSinceLastLocation" : [NSNumber numberWithInt: (int)[locationData objectForKey: @"TimeSinceUpdate"]],
+		    @"ConnectedService" : [NSNumber numberWithInt: (int)[signalInfo getConnectedService]]
 		    };
 }
 @end

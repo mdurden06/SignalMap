@@ -13,6 +13,7 @@
 SignalController *controller;
 
 @interface ViewController ()
+@property (weak, nonatomic) IBOutlet UIButton *infoButton;
 
 @end
 
@@ -21,7 +22,7 @@ SignalController *controller;
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-	
+	_infoButton.enabled = NO;
 	controller = [[SignalController alloc] init];
 }
 
@@ -31,6 +32,7 @@ SignalController *controller;
 }
 - (IBAction)startTracking:(id)sender {
 	[controller setup];
+	_infoButton.enabled = YES;
 	NSLog(@"Tracking started");
 }
 - (IBAction)stopTracking:(id)sender {
@@ -39,11 +41,12 @@ SignalController *controller;
 }
 - (IBAction)getInfo:(id)sender {
 	NSDictionary *results = [controller getInfo];
-	NSLog(@"(%lf,%lf) %d\t%f",
+	NSLog(@"(%lf,%lf) %d\t%f\tService: %d",
 		 [[results objectForKey: @"Latitude"] doubleValue],
 		 [[results objectForKey: @"Longitude"] doubleValue],
 		 [[results objectForKey: @"RawSignal"] intValue],
-		 [[results objectForKey: @"Signal"] floatValue]
+		 [[results objectForKey: @"Signal"] floatValue],
+		 [[results objectForKey: @"ConnectedService"] intValue]
 		 );
 }
 

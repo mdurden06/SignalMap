@@ -9,12 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+typedef enum { kdNone, kdEDGE, kd3G, kd4G, kdLTE } dataType;
+
 @interface SignalData : NSObject
 {
 	BOOL isConnected;
 	int rawSignalStrength;
+	dataType connectedService;
 }
 - (float)getSignalStrength; //returns percent of strength (or 0 if not connected)
+- (dataType)getConnectedService; //returns connected data network type **does not refresh**
 - (int)getRawSignalStrength; //returns rawSignalStrength var (or 0 if not connected)
 @end
 
@@ -41,4 +45,9 @@
 - (void)setup;
 - (void)destroy;
 - (NSDictionary *)getInfo;
+@end
+
+
+@interface CTTelephonyNetworkInfo
+- (id)signalStrength;
 @end
