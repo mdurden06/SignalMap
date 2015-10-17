@@ -42,7 +42,7 @@ typedef enum { kdNone, kdEDGE, kd3G, kd4G, kdLTE } dataType;
 	SignalData *signalInfo;
 	LocationData *locationInfo;
 }
-- (void)setup;
+- (void)setup: (NSObject *)p;
 - (void)destroy;
 - (NSDictionary *)getInfo;
 @end

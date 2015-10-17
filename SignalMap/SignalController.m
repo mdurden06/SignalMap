@@ -11,6 +11,11 @@
 #import <CoreTelephony/CTCarrier.h>
 @import UIKit;
 
+#import "ViewController.h"
+
+ViewController *parentObject;
+SignalController *controllerObject;
+
 /*****Undocumented API Calls*****/
 int CTGetSignalStrength();
 NSString * CTSIMSupportGetSIMStatus();
@@ -21,7 +26,8 @@ void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 #define SIGNAL_RANGE 80.0
 //real range: 40 to 120
 - (float)getSignalStrength {
-	return (float)((float)(SIGNAL_RANGE - ([self getRawSignalStrength] - 40)) / SIGNAL_RANGE) * 100.0;
+	float rawSignal = [self getRawSignalStrength];
+	return rawSignal < 30 ? 0 : 100.0 - (float)((((float)rawSignal - 40) / SIGNAL_RANGE) * 100.0);
 }
 
 - (int)signalStrength{ //pretty clever hack, but it works!
@@ -43,11 +49,10 @@ void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 	//check signal info
 	for (int i = 0; i < 10; i++)
 		rawSignalStrength += [self signalStrength];
-	rawSignalStrength /= 10;
-	rawSignalStrength *= -1;
+	rawSignalStrength /= -10;
 	//compare
 	isConnected = (rawSignalStrength > 0) && isConnected;
-	NSLog(@"Connected: %c\tRaw signal strength: %d\n", isConnected ? '1' : '0', rawSignalStrength);
+	//NSLog(@"Connected: %c\tRaw signal strength: %d\n", isConnected ? '1' : '0', rawSignalStrength);
 	if (!isConnected)
 		return 0;
 	return rawSignalStrength;
@@ -57,8 +62,8 @@ void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 	CTTelephonyNetworkInfo *telephonyInfo = [CTTelephonyNetworkInfo new];
 	NSString *networkType = [telephonyInfo currentRadioAccessTechnology];
 	
-	NSLog(@"Current Radio Access Technology: %@, (%@)", telephonyInfo.currentRadioAccessTechnology,
-		 [[telephonyInfo subscriberCellularProvider]carrierName]);
+	//NSLog(@"Current Radio Access Technology: %@, (%@)", telephonyInfo.currentRadioAccessTechnology,
+	//	 [[telephonyInfo subscriberCellularProvider]carrierName]);
 	if ([networkType isEqualToString: CTRadioAccessTechnologyCDMA1x])
 		ret = kdEDGE;
 	else if ([networkType isEqualToString: CTRadioAccessTechnologyCDMAEVDORev0])
@@ -82,6 +87,9 @@ void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 	else if ([networkType isEqualToString: CTRadioAccessTechnologyLTE])
 		ret = kdLTE;
 	return ret;
+}
+- (NSString *)getCarrier {
+	return [[[CTTelephonyNetworkInfo new] subscriberCellularProvider] carrierName];
 }
 @end
 
@@ -119,16 +127,19 @@ void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 	CLLocation *curPos = [locations objectAtIndex:0];;
 	currLatitude = [curPos coordinate].latitude;
 	currLongitude = [curPos coordinate].longitude;
-	NSLog(@"New location: %lf, %lf\n", currLatitude, currLongitude);
+	//NSLog(@"New location: %lf, %lf\n", currLatitude, currLongitude);
+	[parentObject getInfo: self];
 }
 @end
 
 @implementation SignalController
-- (void)setup {
+- (void)setup: (NSObject *)p {
 	signalInfo = [[SignalData alloc] init];
 	locationInfo = [[LocationData alloc] init];
 	[locationInfo setup]; //set up locationinfo
 	[signalInfo getRawSignalStrength]; //get initial signal reading data
+	parentObject = (ViewController *)p;
+	controllerObject = self;
 }
 - (void)destroy {
 	[locationInfo destroy];
@@ -141,7 +152,8 @@ void CTIndicatorsGetSignalStrength(long int *, long int *, long int *);
 		    @"Signal" : [NSNumber numberWithFloat: [signalInfo getSignalStrength]],
 		    @"RawSignal" : [NSNumber numberWithInt: [signalInfo getRawSignalStrength ]],
 		    @"TimeSinceLastLocation" : [NSNumber numberWithInt: (int)[locationData objectForKey: @"TimeSinceUpdate"]],
-		    @"ConnectedService" : [NSNumber numberWithInt: (int)[signalInfo getConnectedService]]
+		    @"ConnectedService" : [NSNumber numberWithInt: (int)[signalInfo getConnectedService]],
+		    @"Carrier" : [signalInfo getCarrier]
 		    };
 }
 @end
